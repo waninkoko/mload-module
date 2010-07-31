@@ -35,7 +35,8 @@
 _start:
 	mov	r0, #0		@ int argc
 	mov	r1, #0		@ char *argv[]
-	blx	main
+	ldr	r3, =main
+	bx	r3
 
 
 	.code 16

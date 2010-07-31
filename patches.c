@@ -214,6 +214,110 @@ void Patch_EsModule(u32 version)
 		Write8(0x20105FD0, 0xE0);
 
 		break;
+
+	/** 03/03/10 10:40:14 **/
+	case 0x4B8E90EE:
+		/* Signature check */
+		Write16(0x13A75626, 0x2000);
+
+		/* Identify check */
+		Write16(0x20100E74, 0x2803);
+		Write16(0x20100EEC, 0x2803);
+
+		/* Open content permissions */
+		Write8(0x201052E4, 0xE0);
+		Write8(0x20105324, 0xE0);
+		Write8(0x20105348, 0xE0);
+
+		/* Read content permissions */
+		Write16(0x20105450, 0x46C0);
+		Write16(0x20105454, 0x46C0);
+		Write8 (0x20105458, 0xE0);
+
+		/* Close content permissions */
+		Write16(0x201054A0, 0x46C0);
+		Write16(0x201054A4, 0x46C0);
+		Write8 (0x201054A8, 0xE0);
+
+		/* Set UID check */
+		Write16(0x201057BE, 0x46C0);
+
+		/* Title version check */
+		Write8(0x20102CB8, 0xE0);
+
+		/* Title delete check */
+		Write8(0x20108562, 0xE0);
+
+		break;
+
+	/** 03/01/10 03:26:03 **/
+	case 0x4B8B882B:
+		/* Signature check */
+		Write16(0x13A752E6, 0x2000);
+
+		/* Identify check */
+		Write16(0x20100D46, 0x2803);
+		Write16(0x20100DBE, 0x2803);
+
+		/* Open content permissions */
+		Write8(0x20104DF6, 0xE0);
+		Write8(0x20104E1A, 0xE0);
+		Write8(0x20104E3E, 0xE0);
+
+		/* Read content permissions */
+		Write16(0x20104F38, 0x46C0);
+		Write16(0x20104F3C, 0x46C0);
+		Write8 (0x20104F40, 0xE0);
+
+		/* Close content permissions */
+		Write16(0x20104F88, 0x46C0);
+		Write16(0x20104F8C, 0x46C0);
+		Write8 (0x20104F90, 0xE0);
+
+		/* Set UID check */
+		Write16(0x201052A6, 0x46C0);
+
+		/* Title version check */
+		Write8(0x20102818, 0xE0);
+
+		/* Title delete check */
+		Write8(0x20107BAA, 0xE0);
+
+		break;
+
+	/** 03/01/10 03:18:58 **/
+	case 0x4B8B8682:
+		/* Signature check */
+		Write16(0x13A75266, 0x2000);
+
+		/* Identify check */
+		Write16(0x20100CC4, 0x2803);
+		Write16(0x20100D3C, 0x2803);
+
+		/* Open content permissions */
+		Write8(0x20104B20, 0xE0);
+		Write8(0x20104B44, 0xE0);
+
+		/* Read content permissions */
+		Write16(0x20104C3C, 0x46C0);
+		Write16(0x20104C40, 0x46C0);
+		Write8 (0x20104C44, 0xE0);
+
+		/* Close content permissions */
+		Write16(0x20104C8C, 0x46C0);
+		Write16(0x20104C90, 0x46C0);
+		Write8 (0x20104C94, 0xE0);
+
+		/* Set UID check */
+		Write16(0x20104FAA, 0x46C0);
+
+		/* Title version check */
+		Write8(0x201026CC, 0xE0);
+
+		/* Title delete check */
+		Write8(0x20107642, 0xE0);
+
+		break;
 	}
 }
 
@@ -248,21 +352,15 @@ void Patch_IopModule(u32 version)
 	switch (version) {
 	/** 07/11/08 14:34:29 **/
 	/** 11/24/08 15:39:12 **/
+	/** 12/23/08 17:28:32 **/
+	/** 03/03/10 10:43:18 **/
+	/** 03/01/10 03:28:58 **/
+	/** 03/01/10 03:13:17 **/
 	case 0x48776F75:
 	case 0x492ACAA0:
-		/* MEM2 protection */
-		Write16(0xFFFF6F60, 0x2200);
-
-		/* SWI handler */
-		Write32(0xFFFF0028, (u32)SwiVector);
-		
-		break;
-
-	/** 12/23/08 17:28:32 **/
 	case 0x49511FC0:
-		/* MEM2 protection */
-		Write16(0xFFFF66EC, 0x2200);
-
+	case 0x4B8B88DA:
+	case 0x4B8B852D:
 		/* SWI handler */
 		Write32(0xFFFF0028, (u32)SwiVector);
 		

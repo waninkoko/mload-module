@@ -20,7 +20,7 @@ SECTIONS {
 		 *(.exe_mem)
 	} > mem
 
-	.ios_info_table :  {
+	.ios_info_table : {
 		KEEP (*(.ios_info_table))
 	} > table
 

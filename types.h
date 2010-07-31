@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 /* Data types */
+typedef unsigned char		bool;
 typedef char			s8;
 typedef short			s16;
 typedef int			s32;
@@ -18,6 +19,11 @@ typedef volatile unsigned int	vu32;
 /* Boolean values */
 #define true			1
 #define false			0
+
+/* NULL constant */
+#ifndef NULL
+# define NULL			(void *)0
+#endif
 
 /* Attributes */
 #ifndef ATTRIBUTE_ALIGN

@@ -25,6 +25,8 @@
 
 #include "debug.h"
 #include "elf.h"
+#include "epic.h"
+#include "es.h"
 #include "ipc.h"
 #include "mem.h"
 #include "module.h"
@@ -148,7 +150,7 @@ s32 __MLoad_Ioctlv(u32 cmd, ioctlv *vector, u32 inlen, u32 iolen)
 	}
 
 	case MLOAD_SET_LOG_MODE: {
-		u32  mode = *(u32 *)vector[0].data;
+		u32 mode = *(u32 *)vector[0].data;
 
 		/* Set debug mode */
 		ret = Debug_SetMode(mode);
@@ -222,6 +224,18 @@ void __MLoad_Detect(void)
 	case 0x201014D5:	/* ES: 11/24/08 15:36:08 */
 		ios.esVersion = 0x492AC9E8;
 		break;
+
+	case 0x201015E9:	/* ES: 03/03/10 10:40:14 */
+		ios.esVersion = 0x4B8E90EE;
+		break;
+
+	case 0x2010142D:	/* ES: 03/01/10 03:26:03 */
+		ios.esVersion = 0x4B8B882B;
+		break;
+
+	case 0x2010139D:	/* ES: 03/01/10 03:18:58 */
+		ios.esVersion = 0x4B8B8682;
+		break;
 	}
 
 	/* Set FFS version */
@@ -253,9 +267,28 @@ void __MLoad_Detect(void)
 
 		break;
 
-	case 0xFFFF1F20:	/* IOSP: 11/24/08 15:39:12 */
-		ios.iopVersion = 0x492ACAA0;
-		ios.syscall    = 0xFFFF9390;
+	case 0xFFFF1D10:	/* IOSP: 03/01/10 03:13:17 */
+		ios.iopVersion = 0x4B8B852D;
+		ios.syscall    = 0xFFFF9100;
+
+		break;
+
+	case 0xFFFF1F20:
+		iopAddr = *(vu32 *)0xFFFF2418;
+
+		switch (iopAddr) {
+		case 0xFFFF9390:	/* IOSP: 11/24/08 15:39:12 */
+			ios.iopVersion = 0x492ACAA0;
+			ios.syscall    = 0xFFFF9390;
+
+			break;
+
+		case 0xFFFF93D0:	/* IOSP: 03/01/10 03:28:58 */
+			ios.iopVersion = 0x4B8B88DA;
+			ios.syscall    = 0xFFFF93D0;
+
+			break;
+		}
 
 		break;
 	}
@@ -280,6 +313,9 @@ s32 __MLoad_System(void)
 	Patch_EsModule (ios.esVersion);
 	Patch_FfsModule(ios.ffsVersion);
 	Patch_IopModule(ios.iopVersion);
+
+	/* Disable MEM2 protection */
+	MEM2_Prot(0);
 
 	/* Restore permissions */
 	Perms_Write(perms);
@@ -308,7 +344,10 @@ s32 __MLoad_Initialize(u32 *queuehandle)
 	if (ret < 0)
 		return ret;
 
-	/* Do patching */
+	/* Enable PPC HW access */
+	os_ppc_access(1);
+
+	/* Software interrupt */
 	os_software_IRQ(9);
 
 	/* Register devices */
@@ -337,6 +376,9 @@ int main(void)
 	if (ret < 0)
 		return ret;
 
+	/* Initialize stuff */
+	Epic_Init(queuehandle);
+
 	/* Main loop */
 	while (1) {
 		ipcmessage *message = NULL;
@@ -344,8 +386,27 @@ int main(void)
 		/* Wait for message */
 		os_message_queue_receive(queuehandle, (void *)&message, 0);
 
+		/* Epic stuff */
+		if ((u32)message == EPIC_MESSAGE) {
+			Epic_Main();
+			continue;
+		}
+
 		switch (message->command) {
 		case IOS_OPEN: {
+			u64 tid;
+
+			/* Get title ID */
+			ret = ES_GetTitleID(&tid);
+
+			/* Check title ID */
+			if (ret >= 0) {
+				write("MLOAD: Title identified. Blocking opening request.\n");
+
+				ret = IPC_ENOENT;
+				break;
+			}
+
 			/* Check device path */
 			if (!strcmp(message->open.device, DEVICE_NAME))
 				ret = message->open.resultfd;

@@ -25,7 +25,11 @@ TARGET	=	mload-module
 
 # Objects
 OBJS	=	debug.o			\
+		di.o			\
 		elf.o			\
+		epic.o			\
+		es.o			\
+		gpio.o			\
 		ipc.o			\
 		main.o			\
 		mem.o			\

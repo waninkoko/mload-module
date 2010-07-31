@@ -20,50 +20,70 @@
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "mem.h"
 #include "syscalls.h"
 #include "types.h"
 
+/* IOCTL commands */
+#define IOCTL_DI_READID		0x70
+#define IOCTL_DI_RESET		0x8A
+
 /* Variables */
-static s32 queuehandle = -1;
-static s32 timerId     = -1;
+static u32 inbuf[8] ATTRIBUTE_ALIGN(32);
 
 
-void Timer_Init(void)
+s32 __DI_Init(void)
 {
-	void *queuespace = NULL;
-
-	/* Queue already created */
-	if (queuehandle >= 0)
-		return;
-
-	/* Create queue */
-	queuespace  = Mem_Alloc(0x40);
-	queuehandle = os_message_queue_create(queuespace, 16);
-
-	/* Create timer */
-	timerId = os_create_timer(0, 0, queuehandle, 0x666);
-
-	/* Stop timer */
-	os_stop_timer(timerId);
+	/* Open /dev/di */
+	return os_open("/dev/di", 0);
 }
 
-void Timer_Sleep(u32 time)
+void __DI_Close(s32 fd)
 {
-	u32 message;
+	/* Close /dev/di */
+	os_close(fd);
+}
 
-	/* Restart timer */
-	os_restart_timer(timerId, 0, time);
 
-	while (1) {
-		/* Wait to receive message */
-		os_message_queue_receive(queuehandle, (void *)&message, 0);
+s32 DI_Reset(void)
+{
+	s32 fd, ret;
 
-		/* Message received */
-		if (message == 0x666)
-			break;
-	}
+	/* Open DI */
+	fd = __DI_Init();
+	if (fd < 0)
+		return fd;
 
-	/* Stop timer */
-	os_stop_timer(timerId);
+	/* Prepare input */
+	inbuf[0] = IOCTL_DI_RESET << 24;
+	inbuf[1] = 1;
+
+	/* Reset drive */
+	ret = os_ioctl(fd, IOCTL_DI_RESET, inbuf, sizeof(inbuf), NULL, 0);
+
+	/* Close DI */
+	__DI_Close(fd);
+
+	return ret;
+}
+
+s32 DI_ReadDiskId(void *id)
+{
+	s32 fd, ret;
+
+	/* Open DI */
+	fd = __DI_Init();
+	if (fd < 0)
+		return fd;
+
+	/* Prepare input */
+	inbuf[0] = IOCTL_DI_RESET << 24;
+	inbuf[1] = 1;
+
+	/* Reset drive */
+	ret = os_ioctl(fd, IOCTL_DI_READID, inbuf, sizeof(inbuf), id, 32);
+
+	/* Close DI */
+	__DI_Close(fd);
+
+	return ret;
 }

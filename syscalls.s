@@ -266,9 +266,14 @@ os_virt_to_phys:
 	syscall 0x4f
 
 	.code 32
-	.global os_syscall_50
-os_syscall_50:
+	.global os_di_legacy
+os_di_legacy:
 	syscall 0x50
+
+	.code 32
+	.global os_ppc_access
+os_ppc_access:
+	syscall 0x54
 
 
 /*

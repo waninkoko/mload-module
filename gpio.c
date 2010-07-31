@@ -20,30 +20,26 @@
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _TOOLS_H_
-#define _TOOLS_H_
-
+#include "gpio.h"
 #include "types.h"
+#include "utils.h"
+
+/* Constants */
+#define GPIO_OUT	0xD8000C0
+#define GPIO_IN		0xD8000E8
 
 
-/* Directr syscalls */
-void DCInvalidateRange(void* ptr, int size);
-void DCFlushRange(void* ptr, int size);
-void ICInvalidate(void);
+u8 GPIO_Read(u8 bit)
+{
+	/* Return bit value */
+	return Get32(GPIO_IN, bit);
+}
 
-/* MLoad syscalls */
-s32 Swi_MLoad(u32 arg0, u32 arg1, u32 arg2, u32 arg3);
-
-/* ARM permissions */
-u32  Perms_Read(void);
-void Perms_Write(u32 flags);
-
-/* MEM2 routines */
-void MEM2_Prot(u32 flag);
-
-/* Tools */
-void *VirtToPhys(void *address);
-void *PhysToVirt(void *address);
-
-#endif
-
+void GPIO_Write(u8 bit, u8 set)
+{
+	/* Set bit value */
+	if (set)
+		Set32(GPIO_OUT, bit);
+	else
+		Clear32(GPIO_OUT, bit);
+}

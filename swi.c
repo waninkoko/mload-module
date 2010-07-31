@@ -22,6 +22,7 @@
 
 #include <string.h>
 
+#include "gpio.h"
 #include "module.h"
 #include "swi.h"
 #include "tools.h"
@@ -156,19 +157,26 @@ s32 Swi_Handler(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
 
 	/** Led on **/
 	case 128:
-		*(vu32 *)0x0d8000c0 |= 0x20;
+		/* Set GPIO bit */
+		GPIO_Write(5, 1);
 		break;
 	
 	/** Led off **/
 	case 129:
-		*(vu32 *)0x0d8000c0 &=~ 0x20;
+		/* Clear GPIO bit */
+		GPIO_Write(5, 0);
 		break;
 
 	/** Led blink **/
-	case 130:
-		*(vu32 *)0x0d8000c0 ^= 0x20;
+	case 130: {
+		u8 bit = GPIO_Read(5);
+
+		/* Toggle GPIO bit */
+		GPIO_Write(5, !bit);
+
 		break;
-		
+	}
+
 	default:
 		break;
 	}

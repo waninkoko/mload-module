@@ -20,30 +20,66 @@
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _TOOLS_H_
-#define _TOOLS_H_
-
+#include "syscalls.h"
 #include "types.h"
 
+/* IOCTL commands */
+#define IOCTL_ES_GETTITLEID	0x20
+#define IOCTL_ES_LEET		0x1337
 
-/* Directr syscalls */
-void DCInvalidateRange(void* ptr, int size);
-void DCFlushRange(void* ptr, int size);
-void ICInvalidate(void);
+/* Variables */
+static ioctlv vector[8] ATTRIBUTE_ALIGN(32);
 
-/* MLoad syscalls */
-s32 Swi_MLoad(u32 arg0, u32 arg1, u32 arg2, u32 arg3);
 
-/* ARM permissions */
-u32  Perms_Read(void);
-void Perms_Write(u32 flags);
+s32 __ES_Init(void)
+{
+	/* Open /dev/es */
+	return os_open("/dev/es", 0);
+}
 
-/* MEM2 routines */
-void MEM2_Prot(u32 flag);
+void __ES_Close(s32 fd)
+{
+	/* Close /dev/es */
+	os_close(fd);
+}
 
-/* Tools */
-void *VirtToPhys(void *address);
-void *PhysToVirt(void *address);
 
-#endif
+s32 ES_GetTitleID(u64 *tid)
+{
+	s32 fd, ret;
 
+	/* Open ES */
+	fd = __ES_Init();
+	if (fd < 0)
+		return fd;
+
+	/* Setup vector */
+	vector[0].data = tid;
+	vector[0].len  = sizeof(u64);
+
+	/* Get title ID */
+	ret = os_ioctlv(fd, IOCTL_ES_GETTITLEID, 0, 1, vector);
+
+	/* Close ES */
+	__ES_Close(fd);
+
+	return ret;
+}
+
+s32 ES_LeetStuff(void)
+{
+	s32 fd, ret;
+
+	/* Open ES */
+	fd = __ES_Init();
+	if (fd < 0)
+		return fd;
+
+	/* Call IOCTLV */
+	ret = os_ioctlv(fd, IOCTL_ES_LEET, 0, 0, NULL);
+
+	/* Close ES */
+	__ES_Close(fd);
+
+	return ret;
+}

@@ -43,3 +43,18 @@ void Swi_uMemcpy(void *dst, void *src, s32 len)
 	/* Call function */
 	Swi_MLoad(9, (u32)dst, (u32)src, (u32)len);
 }
+
+void Swi_LedOn(void)
+{
+	Swi_MLoad(128, 0, 0, 0);
+}
+
+void Swi_LedOff(void)
+{
+	Swi_MLoad(129, 0, 0, 0);
+}
+
+void Swi_LedBlink(void)
+{
+	Swi_MLoad(130, 0, 0, 0);
+}
