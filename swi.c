@@ -136,7 +136,7 @@ s32 Swi_Handler(u32 arg0, u32 arg1, u32 arg2, u32 arg3)
 		return Function((void *)arg2, (void *)arg3);
 	}
 
-	/** Get syscall base */
+	/** Get syscall base **/
 	case 17:
 		return ios.syscall;
 

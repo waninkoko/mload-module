@@ -359,11 +359,11 @@ void Patch_IopModule(u32 version)
 	case 0x48776F75:
 	case 0x492ACAA0:
 	case 0x49511FC0:
-	case 0x4B8B88DA:
-	case 0x4B8B852D:
+	case 0x4B8E3D46:
+	case 0x4B8B30CD:
 		/* SWI handler */
 		Write32(0xFFFF0028, (u32)SwiVector);
-		
+
 		break;
 	}
 }

@@ -256,6 +256,7 @@ void __MLoad_Detect(void)
 	/* Set IOP version */
 	switch (iopAddr) {
 	case 0xFFFF1D60:	/* IOSP: 07/11/08 14:34:29 */
+				/* IOSP: 03/01/10 03:28:58 */
 		ios.iopVersion = 0x48776F75;
 		ios.syscall    = 0xFFFF91B0;
 
@@ -268,7 +269,7 @@ void __MLoad_Detect(void)
 		break;
 
 	case 0xFFFF1D10:	/* IOSP: 03/01/10 03:13:17 */
-		ios.iopVersion = 0x4B8B852D;
+		ios.iopVersion = 0x4B8B30CD;
 		ios.syscall    = 0xFFFF9100;
 
 		break;
@@ -278,13 +279,14 @@ void __MLoad_Detect(void)
 
 		switch (iopAddr) {
 		case 0xFFFF9390:	/* IOSP: 11/24/08 15:39:12 */
+					/* IOSP: 06/03/09 07:49:12 */
 			ios.iopVersion = 0x492ACAA0;
 			ios.syscall    = 0xFFFF9390;
 
 			break;
 
-		case 0xFFFF93D0:	/* IOSP: 03/01/10 03:28:58 */
-			ios.iopVersion = 0x4B8B88DA;
+		case 0xFFFF93D0:	/* IOSP: 03/03/10 10:43:18 */
+			ios.iopVersion = 0x4B8E3D46;
 			ios.syscall    = 0xFFFF93D0;
 
 			break;
@@ -375,6 +377,8 @@ int main(void)
 	ret = __MLoad_Initialize(&queuehandle);
 	if (ret < 0)
 		return ret;
+
+// 	Debug_SetMode(2);
 
 	/* Initialize stuff */
 	Epic_Init(queuehandle);

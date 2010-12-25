@@ -26,7 +26,7 @@
 #include "types.h"
 
 
-/* Directr syscalls */
+/* Direct syscalls */
 void DCInvalidateRange(void* ptr, int size);
 void DCFlushRange(void* ptr, int size);
 void ICInvalidate(void);
